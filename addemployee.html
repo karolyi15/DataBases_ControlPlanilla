@@ -10,21 +10,7 @@
     <!--Non CSS Style-->
     <style></style>
     <!--Link to Script-->
-    <script src="server.js"></script>
-    <script>
-
-        function getValues(){
-
-            var Name = document.getElementById("Name").value;
-            var IdType = document.getElementById("IdType").value;
-            var IdValue = document.getElementById("IdValue").value;
-            var birthDate = document.getElementById("birthDate").value;
-            var IdJob = document.getElementById("IdJob").value;
-            var IdDepartment = document.getElementById("IdDepartment").value;
-
-            connectDB(Name, IdType, IdValue, birthDate, IdJob, IdDepartment);
-                    }
-    </script>
+    <script src="controller_editemployee.js"></script>
     
 
     <!----------------    HTML Title Section   ----------------->
@@ -79,7 +65,7 @@
 
                     <div class="w3-padding-large w3-right-align">
 
-                        <div onclick="getValues()" type="button" class="w3-red w3-round w3-button">
+                        <div onclick="getEmployeeData()" class="w3-red w3-round w3-button">
                             <a>Confirm</a>
                         </div>
 

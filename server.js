@@ -1,5 +1,8 @@
-var Connection = require('tedious').Connection;
-var Request = require('tedious').Request;
+//Data Base Connection Settings
+
+function connectDB(Name, IdType, IdValue, birthDate, IdJob, IdDepartment){
+
+  const { Connection, Request, TYPES } = require('tedious');
 
     var config = {  
         server: '192.168.0.134',  //update me
@@ -18,23 +21,58 @@ var Request = require('tedious').Request;
             trustServerCertificate: true
         }
     };  
+
+    const connection = new Connection(config);
+
+    const storedProcedure = 'dbo.Nuevo_Empleado';
     
+    connection.connect(function(err) {
+      if (err) {
+        console.log('Connection Failed!');
+        throw err;
+      }
     
-const connection = new Connection(config);
+      const request = new Request(storedProcedure, (err) => {
+        if (err) {
+          throw err;
+        }
+    
+        console.log('DONE!');
+        connection.close();
+      });
+    
+      
+      request.addParameter('idTipoDocumentacionIdentidad', TYPES.Int, IdType);
+      request.addParameter('idPuesto', TYPES.Int, IdJob);
+      request.addParameter('IdDepartamento', TYPES.Int, IdDepartment);
+      request.addParameter('ValorDocumentoIdentidad', TYPES.Int, IdValue);
+      request.addParameter('Nombre', TYPES.VarChar, Name);
+      request.addParameter('FechaNacimiento', TYPES.Date,birthDate);
+      request.addParameter('visible', TYPES.Bit, 1);
+      //request.addOutputParameter('outputCount', TYPES.Int);
+    
+      request.on('returnValue', (paramName, value, metadata) => {
+        console.log(paramName + ' : ' + value);
+      });
+    
+      connection.callProcedure(request);
+    
+    });
 
-connection.on('connect', (err) => {
-  if (err) {
-    console.log('Connection Failed');
-    throw err;
-  }
 
-  executeStatement();
-});
+}
 
-connection.connect();
+function nuevo_Empleado(Name, IdType, IdValue, birthDate, IdJob, IdDepartment){
 
-function executeStatement() {
-  const request = new Request('select * from Users', (err, rowCount) => {
+  /*var Name = document.getElementById("Name");
+  var IdType = document.getElementById("IdType");
+  var IdValue = document.getElementById("IdValue");
+  var birthDate = document.getElementById("birthDate");
+  var IdJob = document.getElementById("IdJob");
+  var IdDepartment = document.getElementById("IdDepartment");*/
+
+
+  const request = new Request(storedProcedure, (err) => {
     if (err) {
       throw err;
     }
@@ -43,27 +81,22 @@ function executeStatement() {
     connection.close();
   });
 
-  // Emits a 'DoneInProc' event when completed.
-  request.on('row', (columns) => {
-    columns.forEach((column) => {
-      if (column.value === null) {
-        console.log('NULL');
-      } else {
+  
+  request.addParameter('idTipoDocumentacionIdentidad', TYPES.Int, IdType);
+  request.addParameter('idPuesto', TYPES.Int, IdJob);
+  request.addParameter('IdDepartamento', TYPES.Int, IdDepartment);
+  request.addParameter('ValorDocumentoIdentidad', TYPES.Int, IdValue);
+  request.addParameter('Nombre', TYPES.VarChar, Name);
+  request.addParameter('FechaNacimiento', TYPES.Date,birthDate);
+  request.addParameter('visible', TYPES.Bit, 1);
+  //request.addOutputParameter('outputCount', TYPES.Int);
 
-        console.log(column.value);
-        
-      }
-    });
+  request.on('returnValue', (paramName, value, metadata) => {
+    console.log(paramName + ' : ' + value);
   });
 
-  request.on('done', (rowCount) => {
-    console.log('Done is called!');
-  });
+  connection.callProcedure(request);
 
-  request.on('doneInProc', (rowCount, more) => {
-    console.log(rowCount + ' rows returned');
-  });
-
-  // In SQL Server 2000 you may need: connection.execSqlBatch(request);
-  connection.execSql(request);
 }
+
+//connectDB("josue", 1, 1, "2010-3-3", 1, 1);
